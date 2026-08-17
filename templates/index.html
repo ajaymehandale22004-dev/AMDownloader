@@ -1,0 +1,346 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>AMDownloader</title>
+
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+
+<body>
+
+    <!-- Navbar -->
+    <header class="navbar">
+
+        <div class="logo">
+            <span>AM</span>Downloader
+        </div>
+
+        <nav>
+            <a href="#home">Home</a>
+            <a href="#features">Features</a>
+            <a href="#about">About</a>
+        </nav>
+
+    </header>
+
+
+    <main id="home">
+
+        <!-- Hero Section -->
+        <section class="hero">
+
+            <div class="badge">
+                ⚡ Fast & Simple Media Downloader
+            </div>
+
+            <h1>
+                Download Your Favorite
+                <span>Media</span>
+            </h1>
+
+            <p class="hero-text">
+                Download supported media from YouTube, Instagram and Facebook.
+                Choose video quality or audio format before downloading.
+            </p>
+
+
+            <!-- Downloader -->
+            <div class="download-box">
+
+
+                <!-- Platforms -->
+                <div class="platforms">
+
+                    <button
+                        class="platform active"
+                        data-platform="youtube"
+                        type="button"
+                    >
+                        <span>▶</span>
+                        YouTube
+                    </button>
+
+
+                    <button
+                        class="platform"
+                        data-platform="instagram"
+                        type="button"
+                    >
+                        <span>◎</span>
+                        Instagram
+                    </button>
+
+
+                    <button
+                        class="platform"
+                        data-platform="facebook"
+                        type="button"
+                    >
+                        <span>f</span>
+                        Facebook
+                    </button>
+
+                </div>
+
+
+                <!-- URL Input -->
+                <div class="input-area">
+
+                    <input
+                        type="text"
+                        id="urlInput"
+                        placeholder="Paste your YouTube URL here..."
+                        autocomplete="off"
+                    >
+
+                </div>
+
+
+                <!-- Download Options -->
+                <div class="download-options">
+
+                    <div class="option-title">
+                        Download Type
+                    </div>
+
+
+                    <!-- Video / Audio -->
+                    <div class="type-buttons">
+
+                        <button
+                            class="type-btn active"
+                            data-type="video"
+                            type="button"
+                        >
+                            🎬 Video
+                        </button>
+
+
+                        <button
+                            class="type-btn"
+                            data-type="audio"
+                            type="button"
+                        >
+                            🎵 Audio
+                        </button>
+
+                    </div>
+
+
+                    <!-- Video Quality -->
+                    <div
+                        class="quality-section"
+                        id="videoQuality"
+                    >
+
+                        <label for="videoQualitySelect">
+                            Video Quality
+                        </label>
+
+
+                        <select id="videoQualitySelect">
+
+                            <option value="best">
+                                Best Quality
+                            </option>
+
+                            <option value="1080">
+                                1080p Full HD
+                            </option>
+
+                            <option value="720">
+                                720p HD
+                            </option>
+
+                            <option value="480">
+                                480p
+                            </option>
+
+                            <option value="360">
+                                360p
+                            </option>
+
+                        </select>
+
+                    </div>
+
+
+                    <!-- Audio Format -->
+                    <div
+                        class="quality-section"
+                        id="audioQuality"
+                        style="display: none;"
+                    >
+
+                        <label for="audioQualitySelect">
+                            Audio Format
+                        </label>
+
+
+                        <select id="audioQualitySelect">
+
+                            <option value="best">
+                                Best Audio
+                            </option>
+
+                            <option value="mp3">
+                                MP3
+                            </option>
+
+                            <option value="m4a">
+                                M4A
+                            </option>
+
+                        </select>
+
+                    </div>
+
+
+                    <!-- Download Button -->
+                    <div class="download-action">
+
+                        <button
+                            id="downloadBtn"
+                            type="button"
+                        >
+                            Download
+                        </button>
+
+                    </div>
+
+                </div>
+
+
+                <!-- Status -->
+                <div
+                    id="status"
+                    class="status"
+                ></div>
+
+
+            </div>
+
+        </section>
+
+
+        <!-- Features Section -->
+        <section
+            class="features"
+            id="features"
+        >
+
+            <h2>
+                Why Choose AMDownloader?
+            </h2>
+
+
+            <p class="section-subtitle">
+                Simple, fast and easy to use.
+            </p>
+
+
+            <div class="feature-grid">
+
+
+                <!-- Feature 1 -->
+                <div class="feature-card">
+
+                    <div class="icon">
+                        ⚡
+                    </div>
+
+                    <h3>
+                        Fast Processing
+                    </h3>
+
+                    <p>
+                        Process supported media links with a simple
+                        and easy workflow.
+                    </p>
+
+                </div>
+
+
+                <!-- Feature 2 -->
+                <div class="feature-card">
+
+                    <div class="icon">
+                        🎬
+                    </div>
+
+                    <h3>
+                        Video & Audio
+                    </h3>
+
+                    <p>
+                        Choose your preferred video quality or
+                        download audio separately.
+                    </p>
+
+                </div>
+
+
+                <!-- Feature 3 -->
+                <div class="feature-card">
+
+                    <div class="icon">
+                        📱
+                    </div>
+
+                    <h3>
+                        Mobile Friendly
+                    </h3>
+
+                    <p>
+                        Use AMDownloader easily on mobile,
+                        tablet and desktop.
+                    </p>
+
+                </div>
+
+
+            </div>
+
+        </section>
+
+
+        <!-- About Section -->
+        <section
+            class="about"
+            id="about"
+        >
+
+            <h2>
+                About AMDownloader
+            </h2>
+
+
+            <p>
+                AMDownloader provides a simple interface for processing
+                supported media URLs and selecting your preferred format.
+            </p>
+
+        </section>
+
+    </main>
+
+
+    <!-- Footer -->
+    <footer>
+
+        <p>
+            © 2026 AMDownloader. All rights reserved.
+        </p>
+
+    </footer>
+
+
+    <script src="{{ url_for('static', filename='script.js') }}"></script>
+
+</body>
+
+</html>
