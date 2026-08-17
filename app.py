@@ -245,7 +245,7 @@ def download():
         )
 
         if is_youtube:
-
+            
             print("")
             print("=" * 60)
             print("YOUTUBE CONFIGURATION")
@@ -263,21 +263,16 @@ def download():
 
             print("=" * 60)
 
-            # Use mweb together with the bgutil HTTP POT provider
-            # on both localhost and Render.
             options["extractor_args"] = {
                 "youtube": {
                     "player_client": ["mweb"]
                 },
                 "youtubepot-bgutilhttp": {
-                    "base_url": POT_SERVER,
-                    "disable_innertube": "1"
+                    "base_url": POT_SERVER
                 }
             }
 
-            # Temporary verbose logging for Render debugging
             options["verbose"] = True
-
             options["socket_timeout"] = 30
             options["retries"] = 2
             options["fragment_retries"] = 2
