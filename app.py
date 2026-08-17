@@ -183,39 +183,51 @@ def download():
 
         else:
 
+            # Instagram/Facebook reels can provide a single combined
+            # video+audio format. Try that first, then separate streams,
+            # then fall back to the best available format.
+
             if quality == "1080":
 
                 video_format = (
+                    "best[height<=1080]/"
                     "bestvideo[height<=1080]+bestaudio/"
-                    "best[height<=1080]"
+                    "bestvideo+bestaudio/"
+                    "best"
                 )
 
             elif quality == "720":
 
                 video_format = (
+                    "best[height<=720]/"
                     "bestvideo[height<=720]+bestaudio/"
-                    "best[height<=720]"
+                    "bestvideo+bestaudio/"
+                    "best"
                 )
 
             elif quality == "480":
 
                 video_format = (
+                    "best[height<=480]/"
                     "bestvideo[height<=480]+bestaudio/"
-                    "best[height<=480]"
+                    "bestvideo+bestaudio/"
+                    "best"
                 )
 
             elif quality == "360":
 
                 video_format = (
+                    "best[height<=360]/"
                     "bestvideo[height<=360]+bestaudio/"
-                    "best[height<=360]"
+                    "bestvideo+bestaudio/"
+                    "best"
                 )
 
             else:
 
                 video_format = (
-                    "bestvideo+bestaudio/"
-                    "best"
+                    "best/"
+                    "bestvideo+bestaudio"
                 )
 
 

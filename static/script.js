@@ -1,261 +1,664 @@
-const platformButtons = document.querySelectorAll(".platform");
-const typeButtons = document.querySelectorAll(".type-btn");
+document.addEventListener("DOMContentLoaded", () => {
 
-const urlInput = document.getElementById("urlInput");
-const downloadBtn = document.getElementById("downloadBtn");
-const statusBox = document.getElementById("status");
+    const platformButtons = document.querySelectorAll(".platform");
+    const typeButtons = document.querySelectorAll(".type-btn");
 
-const videoQuality = document.getElementById("videoQuality");
-const audioQuality = document.getElementById("audioQuality");
+    const urlInput = document.getElementById("urlInput");
+    const downloadBtn = document.getElementById("downloadBtn");
 
-const videoQualitySelect =
-    document.getElementById("videoQualitySelect");
+    const videoQuality = document.getElementById("videoQuality");
+    const audioQuality = document.getElementById("audioQuality");
 
-const audioQualitySelect =
-    document.getElementById("audioQualitySelect");
+    const videoQualitySelect =
+        document.getElementById("videoQualitySelect");
 
-let selectedPlatform = "youtube";
-let selectedType = "video";
+    const audioQualitySelect =
+        document.getElementById("audioQualitySelect");
 
-
-/* Platform selection */
-
-platformButtons.forEach((button) => {
-
-    button.addEventListener("click", () => {
-
-        platformButtons.forEach((btn) => {
-            btn.classList.remove("active");
-        });
-
-        button.classList.add("active");
-
-        selectedPlatform = button.dataset.platform;
-
-        const names = {
-            youtube: "YouTube",
-            instagram: "Instagram",
-            facebook: "Facebook"
-        };
-
-        urlInput.placeholder =
-            `Paste your ${names[selectedPlatform]} URL here...`;
-
-        clearStatus();
-    });
-
-});
+    const status = document.getElementById("status");
 
 
-/* Video / Audio selection */
+    /* =========================
+       CURRENT SETTINGS
+    ========================= */
 
-typeButtons.forEach((button) => {
+    let currentPlatform = "instagram";
+    let currentType = "video";
 
-    button.addEventListener("click", () => {
 
-        typeButtons.forEach((btn) => {
-            btn.classList.remove("active");
-        });
+    /* =========================
+       STATUS MESSAGE
+    ========================= */
 
-        button.classList.add("active");
+    function showStatus(message, type = "error") {
 
-        selectedType = button.dataset.type;
+        if (!status) {
+            return;
+        }
 
-        if (selectedType === "video") {
+        status.textContent = message;
 
-            videoQuality.style.display = "flex";
-            audioQuality.style.display = "none";
+        status.className = "status show " + type;
+    }
+
+
+    function hideStatus() {
+
+        if (!status) {
+            return;
+        }
+
+        status.textContent = "";
+
+        status.className = "status";
+    }
+
+
+    /* =========================
+       URL PLACEHOLDER
+    ========================= */
+
+    function updatePlaceholder() {
+
+        if (!urlInput) {
+            return;
+        }
+
+        if (currentPlatform === "instagram") {
+
+            urlInput.placeholder =
+                "Paste your Instagram URL here...";
+
+        } else if (currentPlatform === "facebook") {
+
+            urlInput.placeholder =
+                "Paste your Facebook URL here...";
 
         } else {
 
-            videoQuality.style.display = "none";
-            audioQuality.style.display = "flex";
+            urlInput.placeholder =
+                "Paste your media URL here...";
+        }
+    }
 
+
+    /* =========================
+       PLATFORM BUTTONS
+    ========================= */
+
+    platformButtons.forEach((button) => {
+
+        const platform =
+            button.dataset.platform;
+
+        /* Hide YouTube completely */
+
+        if (platform === "youtube") {
+
+            button.style.display = "none";
+
+            return;
         }
 
-        clearStatus();
-    });
 
-});
+        button.addEventListener("click", () => {
 
-
-/* Download */
-
-downloadBtn.addEventListener("click", async () => {
-
-    const url = urlInput.value.trim();
-
-    if (!url) {
-
-        showStatus(
-            "Please paste a video URL first.",
-            "error"
-        );
-
-        return;
-    }
+            currentPlatform = platform;
 
 
-    let quality = "best";
+            /* Active button */
 
-    if (selectedType === "video") {
+            platformButtons.forEach((item) => {
 
-        quality = videoQualitySelect.value;
+                item.classList.remove("active");
 
-    } else {
+            });
 
-        quality = audioQualitySelect.value;
-
-    }
+            button.classList.add("active");
 
 
-    downloadBtn.disabled = true;
-    downloadBtn.textContent = "Processing...";
+            /* Update placeholder */
 
-    clearStatus();
+            updatePlaceholder();
 
 
-    try {
+            /* Clear old status */
 
-        const response = await fetch("/download", {
+            hideStatus();
 
-            method: "POST",
 
-            headers: {
-                "Content-Type": "application/json"
-            },
+            /* Clear URL */
 
-            body: JSON.stringify({
+            if (urlInput) {
 
-                url: url,
+                urlInput.value = "";
 
-                platform: selectedPlatform,
+                urlInput.focus();
 
-                type: selectedType,
-
-                quality: quality
-
-            })
+            }
 
         });
 
-
-        const contentType =
-            response.headers.get("content-type");
+    });
 
 
-        if (!response.ok) {
+    /* =========================
+       VIDEO / AUDIO BUTTONS
+    ========================= */
 
-            let message =
-                "Unable to download this media.";
+    typeButtons.forEach((button) => {
 
-            if (
-                contentType &&
-                contentType.includes("application/json")
-            ) {
+        button.addEventListener("click", () => {
 
-                const data = await response.json();
+            currentType =
+                button.dataset.type;
 
-                if (data.message) {
-                    message = data.message;
+
+            /* Active button */
+
+            typeButtons.forEach((item) => {
+
+                item.classList.remove("active");
+
+            });
+
+            button.classList.add("active");
+
+
+            /* Show video quality */
+
+            if (currentType === "video") {
+
+                if (videoQuality) {
+
+                    videoQuality.style.display =
+                        "flex";
+
+                }
+
+                if (audioQuality) {
+
+                    audioQuality.style.display =
+                        "none";
+
                 }
 
             }
 
-            showStatus(message, "error");
 
-            return;
+            /* Show audio quality */
+
+            else {
+
+                if (videoQuality) {
+
+                    videoQuality.style.display =
+                        "none";
+
+                }
+
+                if (audioQuality) {
+
+                    audioQuality.style.display =
+                        "flex";
+
+                }
+
+            }
+
+
+            hideStatus();
+
+        });
+
+    });
+
+
+    /* =========================
+       URL VALIDATION
+    ========================= */
+
+    function isValidUrl(url) {
+
+        try {
+
+            new URL(url);
+
+            return true;
+
+        } catch {
+
+            return false;
+
         }
-
-
-        if (
-            contentType &&
-            contentType.includes("application/json")
-        ) {
-
-            const data = await response.json();
-
-            showStatus(
-                data.message || "Download failed.",
-                "error"
-            );
-
-            return;
-        }
-
-
-        const blob = await response.blob();
-
-        const downloadUrl =
-            window.URL.createObjectURL(blob);
-
-        const link =
-            document.createElement("a");
-
-        link.href = downloadUrl;
-
-        if (selectedType === "audio") {
-
-            link.download =
-                `AMDownloader-audio.${quality === "mp3" ? "mp3" : "m4a"}`;
-
-        } else {
-
-            link.download =
-                "AMDownloader-video.mp4";
-
-        }
-
-        document.body.appendChild(link);
-
-        link.click();
-
-        link.remove();
-
-        window.URL.revokeObjectURL(downloadUrl);
-
-
-        showStatus(
-            "Download started successfully.",
-            "success"
-        );
-
-
-    } catch (error) {
-
-        console.error(error);
-
-        showStatus(
-            "Server connection failed. Please try again.",
-            "error"
-        );
-
-    } finally {
-
-        downloadBtn.disabled = false;
-        downloadBtn.textContent = "Download";
 
     }
 
+
+    function validatePlatformUrl(url) {
+
+        const lowerUrl =
+            url.toLowerCase();
+
+
+        if (currentPlatform === "instagram") {
+
+            return lowerUrl.includes(
+                "instagram.com"
+            );
+
+        }
+
+
+        if (currentPlatform === "facebook") {
+
+            return (
+                lowerUrl.includes("facebook.com") ||
+                lowerUrl.includes("fb.watch")
+            );
+
+        }
+
+
+        return false;
+
+    }
+
+
+    /* =========================
+       DOWNLOAD
+    ========================= */
+
+    if (downloadBtn) {
+
+        downloadBtn.addEventListener("click", async () => {
+
+            hideStatus();
+
+
+            const url =
+                urlInput.value.trim();
+
+
+            /* Empty URL */
+
+            if (!url) {
+
+                showStatus(
+                    "Please paste an Instagram or Facebook URL."
+                );
+
+                return;
+
+            }
+
+
+            /* URL format */
+
+            if (!isValidUrl(url)) {
+
+                showStatus(
+                    "Please enter a valid URL."
+                );
+
+                return;
+
+            }
+
+
+            /* Platform check */
+
+            if (!validatePlatformUrl(url)) {
+
+                if (currentPlatform === "instagram") {
+
+                    showStatus(
+                        "Please enter a valid Instagram URL."
+                    );
+
+                } else {
+
+                    showStatus(
+                        "Please enter a valid Facebook URL."
+                    );
+
+                }
+
+                return;
+
+            }
+
+
+            /* =========================
+               GET QUALITY
+            ========================= */
+
+            let quality = "best";
+
+
+            if (currentType === "video") {
+
+                quality =
+                    videoQualitySelect
+                        ? videoQualitySelect.value
+                        : "best";
+
+            } else {
+
+                quality =
+                    audioQualitySelect
+                        ? audioQualitySelect.value
+                        : "best";
+
+            }
+
+
+            /* =========================
+               BUTTON LOADING
+            ========================= */
+
+            const originalText =
+                downloadBtn.textContent;
+
+
+            downloadBtn.disabled = true;
+
+            downloadBtn.textContent =
+                "Processing...";
+
+
+            try {
+
+                console.log(
+                    "Starting download..."
+                );
+
+                console.log(
+                    "Platform:",
+                    currentPlatform
+                );
+
+                console.log(
+                    "Type:",
+                    currentType
+                );
+
+                console.log(
+                    "Quality:",
+                    quality
+                );
+
+
+                /* =========================
+                   SEND REQUEST
+                ========================= */
+
+                const response =
+                    await fetch("/download", {
+
+                        method: "POST",
+
+                        headers: {
+                            "Content-Type":
+                                "application/json"
+                        },
+
+                        body: JSON.stringify({
+
+                            url: url,
+
+                            type: currentType,
+
+                            quality: quality
+
+                        })
+
+                    });
+
+
+                /* =========================
+                   CHECK RESPONSE
+                ========================= */
+
+                const contentType =
+                    response.headers.get(
+                        "content-type"
+                    ) || "";
+
+
+                /* Server returned JSON error */
+
+                if (
+                    contentType.includes(
+                        "application/json"
+                    )
+                ) {
+
+                    const data =
+                        await response.json();
+
+
+                    if (!response.ok) {
+
+                        throw new Error(
+                            data.message ||
+                            "Download failed."
+                        );
+
+                    }
+
+
+                    if (
+                        data.success === false
+                    ) {
+
+                        throw new Error(
+                            data.message ||
+                            "Download failed."
+                        );
+
+                    }
+
+                }
+
+
+                /* Server error */
+
+                if (!response.ok) {
+
+                    throw new Error(
+                        "Server error " +
+                        response.status
+                    );
+
+                }
+
+
+                /* =========================
+                   GET FILE
+                ========================= */
+
+                const blob =
+                    await response.blob();
+
+
+                if (!blob || blob.size === 0) {
+
+                    throw new Error(
+                        "Downloaded file is empty."
+                    );
+
+                }
+
+
+                /* =========================
+                   FILE NAME
+                ========================= */
+
+                let filename =
+                    "AMDownloader-Video.mp4";
+
+
+                if (currentType === "audio") {
+
+                    if (quality === "mp3") {
+
+                        filename =
+                            "AMDownloader-Audio.mp3";
+
+                    } else {
+
+                        filename =
+                            "AMDownloader-Audio.m4a";
+
+                    }
+
+                }
+
+
+                /* =========================
+                   DOWNLOAD FILE
+                ========================= */
+
+                const blobUrl =
+                    window.URL.createObjectURL(
+                        blob
+                    );
+
+
+                const link =
+                    document.createElement("a");
+
+
+                link.href = blobUrl;
+
+                link.download = filename;
+
+                document.body.appendChild(link);
+
+                link.click();
+
+                link.remove();
+
+
+                window.URL.revokeObjectURL(
+                    blobUrl
+                );
+
+
+                /* =========================
+                   SUCCESS
+                ========================= */
+
+                showStatus(
+                    "Download completed successfully.",
+                    "success"
+                );
+
+
+            } catch (error) {
+
+                console.error(
+                    "Download error:",
+                    error
+                );
+
+
+                showStatus(
+                    error.message ||
+                    "Unable to download this media. Please try again."
+                );
+
+
+            } finally {
+
+                downloadBtn.disabled =
+                    false;
+
+                downloadBtn.textContent =
+                    originalText;
+
+            }
+
+        });
+
+    }
+
+
+    /* =========================
+       INITIAL SETTINGS
+    ========================= */
+
+    currentPlatform = "instagram";
+
+    currentType = "video";
+
+
+    /* Make Instagram active */
+
+    platformButtons.forEach((button) => {
+
+        if (
+            button.dataset.platform ===
+            "instagram"
+        ) {
+
+            button.classList.add("active");
+
+        }
+
+        if (
+            button.dataset.platform ===
+            "youtube"
+        ) {
+
+            button.style.display = "none";
+
+            button.classList.remove(
+                "active"
+            );
+
+        }
+
+    });
+
+
+    /* Make Video active */
+
+    typeButtons.forEach((button) => {
+
+        if (
+            button.dataset.type ===
+            "video"
+        ) {
+
+            button.classList.add("active");
+
+        }
+
+    });
+
+
+    /* Show video quality */
+
+    if (videoQuality) {
+
+        videoQuality.style.display =
+            "flex";
+
+    }
+
+
+    if (audioQuality) {
+
+        audioQuality.style.display =
+            "none";
+
+    }
+
+
+    /* Set correct placeholder */
+
+    updatePlaceholder();
+
 });
-
-
-/* Status */
-
-function showStatus(message, type) {
-
-    statusBox.textContent = message;
-
-    statusBox.className =
-        `status show ${type}`;
-
-}
-
-
-function clearStatus() {
-
-    statusBox.textContent = "";
-
-    statusBox.className = "status";
-
-}
