@@ -4,129 +4,70 @@ import os
 import uuid
 import glob
 
-
 app = Flask(__name__)
 
-
-# ============================================================
-# DOWNLOAD FOLDER
-# ============================================================
-
 DOWNLOAD_FOLDER = "downloads"
-
 os.makedirs(DOWNLOAD_FOLDER, exist_ok=True)
 
 
-# ============================================================
+# ------------------------------------------------
 # ENVIRONMENT
-# ============================================================
+# ------------------------------------------------
 
-IS_RENDER = os.getenv("RENDER", "").lower() == "true"
+IS_RENDER = os.getenv("RENDER") == "true"
 
-
-# ============================================================
-# BGUTIL POT SERVER
-# ============================================================
-
-# Local:
-# http://127.0.0.1:4416
-#
-# Render:
-# https://amdownloader-pot.onrender.com
-
+# Local bgutil server
+# Render par 127.0.0.1:4416 use nahi karna
 POT_SERVER = os.getenv(
     "POT_SERVER",
     "http://127.0.0.1:4416"
-).strip()
+)
 
 
-# ============================================================
+# ------------------------------------------------
 # HOME
-# ============================================================
+# ------------------------------------------------
 
 @app.route("/")
 def home():
     return render_template("index.html")
 
 
-# ============================================================
-# HEALTH CHECK
-# ============================================================
-
-@app.route("/health")
-def health():
-
-    return jsonify({
-        "success": True,
-        "status": "online",
-        "render": IS_RENDER,
-        "pot_server": POT_SERVER
-    })
-
-
-# ============================================================
+# ------------------------------------------------
 # CHECK URL
-# ============================================================
+# ------------------------------------------------
 
 @app.route("/check-url", methods=["POST"])
 def check_url():
 
-    data = request.get_json(silent=True) or {}
+    data = request.get_json() or {}
 
     url = data.get("url", "").strip()
 
-
     if not url:
-
         return jsonify({
             "success": False,
             "message": "Please enter a URL."
-        }), 400
+        })
 
-
-    # --------------------------------------------------------
-    # YouTube
-    # --------------------------------------------------------
-
-    if (
-        "youtube.com" in url.lower()
-        or "youtu.be" in url.lower()
-    ):
+    if "youtube.com" in url or "youtu.be" in url:
 
         platform = "YouTube"
 
-
-    # --------------------------------------------------------
-    # Instagram
-    # --------------------------------------------------------
-
-    elif "instagram.com" in url.lower():
+    elif "instagram.com" in url:
 
         platform = "Instagram"
 
-
-    # --------------------------------------------------------
-    # Facebook
-    # --------------------------------------------------------
-
-    elif (
-        "facebook.com" in url.lower()
-        or "fb.watch" in url.lower()
-    ):
+    elif "facebook.com" in url or "fb.watch" in url:
 
         platform = "Facebook"
-
 
     else:
 
         return jsonify({
             "success": False,
-            "message": (
-                "Please enter a valid YouTube, "
-                "Instagram or Facebook URL."
-            )
-        }), 400
-
+            "message": "Please enter a valid YouTube, Instagram or Facebook URL."
+        })
 
     return jsonify({
         "success": True,
@@ -135,32 +76,18 @@ def check_url():
     })
 
 
-# ============================================================
+# ------------------------------------------------
 # DOWNLOAD
-# ============================================================
+# ------------------------------------------------
 
 @app.route("/download", methods=["POST"])
 def download():
 
-    data = request.get_json(silent=True) or {}
-
+    data = request.get_json() or {}
 
     url = data.get("url", "").strip()
-
-    media_type = data.get(
-        "type",
-        "video"
-    )
-
-    quality = data.get(
-        "quality",
-        "best"
-    )
-
-
-    # ========================================================
-    # BASIC VALIDATION
-    # ========================================================
+    media_type = data.get("type", "video")
+    quality = data.get("quality", "best")
 
     if not url:
 
@@ -170,18 +97,17 @@ def download():
         }), 400
 
 
+    # ------------------------------------------------
+    # SUPPORTED URL CHECK
+    # ------------------------------------------------
+
     supported_url = (
-
-        "youtube.com" in url.lower()
-        or "youtu.be" in url.lower()
-
-        or "instagram.com" in url.lower()
-
-        or "facebook.com" in url.lower()
-        or "fb.watch" in url.lower()
-
+        "youtube.com" in url
+        or "youtu.be" in url
+        or "instagram.com" in url
+        or "facebook.com" in url
+        or "fb.watch" in url
     )
-
 
     if not supported_url:
 
@@ -191,18 +117,14 @@ def download():
         }), 400
 
 
-    # ========================================================
-    # FILE ID
-    # ========================================================
-
     file_id = str(uuid.uuid4())
 
 
     try:
 
-        # ====================================================
-        # OUTPUT TEMPLATE
-        # ====================================================
+        # ------------------------------------------------
+        # COMMON OPTIONS
+        # ------------------------------------------------
 
         output_template = os.path.join(
             DOWNLOAD_FOLDER,
@@ -210,86 +132,56 @@ def download():
         )
 
 
-        # ====================================================
-        # AUDIO DOWNLOAD
-        # ====================================================
+        # ------------------------------------------------
+        # AUDIO
+        # ------------------------------------------------
 
         if media_type == "audio":
-
-            # ------------------------------------------------
-            # MP3
-            # ------------------------------------------------
 
             if quality == "mp3":
 
                 options = {
 
-                    "format":
-                        "bestaudio/best",
+                    "format": "bestaudio/best",
 
-                    "outtmpl":
-                        output_template,
+                    "outtmpl": output_template,
 
-                    "noplaylist":
-                        True,
+                    "noplaylist": True,
 
-                    "quiet":
-                        False,
+                    "quiet": False,
 
-                    "no_warnings":
-                        False,
+                    "no_warnings": False,
 
                     "postprocessors": [
-
                         {
-                            "key":
-                                "FFmpegExtractAudio",
-
-                            "preferredcodec":
-                                "mp3",
-
-                            "preferredquality":
-                                "192"
+                            "key": "FFmpegExtractAudio",
+                            "preferredcodec": "mp3",
+                            "preferredquality": "192"
                         }
-
                     ]
                 }
-
-
-            # ------------------------------------------------
-            # M4A
-            # ------------------------------------------------
 
             else:
 
                 options = {
 
-                    "format":
-                        "bestaudio[ext=m4a]/bestaudio",
+                    "format": "bestaudio[ext=m4a]/bestaudio",
 
-                    "outtmpl":
-                        output_template,
+                    "outtmpl": output_template,
 
-                    "noplaylist":
-                        True,
+                    "noplaylist": True,
 
-                    "quiet":
-                        False,
+                    "quiet": False,
 
-                    "no_warnings":
-                        False
+                    "no_warnings": False
                 }
 
 
-        # ====================================================
-        # VIDEO DOWNLOAD
-        # ====================================================
+        # ------------------------------------------------
+        # VIDEO
+        # ------------------------------------------------
 
         else:
-
-            # ------------------------------------------------
-            # 1080p
-            # ------------------------------------------------
 
             if quality == "1080":
 
@@ -298,22 +190,12 @@ def download():
                     "best[height<=1080]"
                 )
 
-
-            # ------------------------------------------------
-            # 720p
-            # ------------------------------------------------
-
             elif quality == "720":
 
                 video_format = (
                     "bestvideo[height<=720]+bestaudio/"
                     "best[height<=720]"
                 )
-
-
-            # ------------------------------------------------
-            # 480p
-            # ------------------------------------------------
 
             elif quality == "480":
 
@@ -322,22 +204,12 @@ def download():
                     "best[height<=480]"
                 )
 
-
-            # ------------------------------------------------
-            # 360p
-            # ------------------------------------------------
-
             elif quality == "360":
 
                 video_format = (
                     "bestvideo[height<=360]+bestaudio/"
                     "best[height<=360]"
                 )
-
-
-            # ------------------------------------------------
-            # BEST
-            # ------------------------------------------------
 
             else:
 
@@ -349,41 +221,28 @@ def download():
 
             options = {
 
-                "format":
-                    video_format,
+                "format": video_format,
 
-                "outtmpl":
-                    output_template,
+                "outtmpl": output_template,
 
-                "merge_output_format":
-                    "mp4",
+                "merge_output_format": "mp4",
 
-                "noplaylist":
-                    True,
+                "noplaylist": True,
 
-                "quiet":
-                    False,
+                "quiet": False,
 
-                "no_warnings":
-                    False
+                "no_warnings": False
             }
 
 
-        # ====================================================
-        # YOUTUBE DETECTION
-        # ====================================================
+        # ------------------------------------------------
+        # YOUTUBE CONFIGURATION
+        # ------------------------------------------------
 
         is_youtube = (
-
-            "youtube.com" in url.lower()
-            or "youtu.be" in url.lower()
-
+            "youtube.com" in url
+            or "youtu.be" in url
         )
-
-
-        # ====================================================
-        # YOUTUBE + BGUTIL POT
-        # ====================================================
 
         if is_youtube:
 
@@ -404,87 +263,47 @@ def download():
 
             print("=" * 60)
 
-
-            # IMPORTANT:
-            # BGUTIL is used in BOTH local and Render.
-            #
-            # Local:
-            # http://127.0.0.1:4416
-            #
-            # Render:
-            # https://amdownloader-pot.onrender.com
-
+            # Use mweb together with the bgutil HTTP POT provider
+            # on both localhost and Render.
             options["extractor_args"] = {
-
                 "youtube": {
-
-                    "player_client": [
-                        "mweb"
-                    ]
-
+                    "player_client": ["mweb"]
                 },
-
                 "youtubepot-bgutilhttp": {
-
-                    "base_url":
-                        POT_SERVER
-
+                    "base_url": POT_SERVER,
+                    "disable_innertube": "1"
                 }
-
             }
 
-
-            # ------------------------------------------------
-            # Additional HTTP settings
-            # ------------------------------------------------
+            # Temporary verbose logging for Render debugging
+            options["verbose"] = True
 
             options["socket_timeout"] = 30
-
             options["retries"] = 2
-
             options["fragment_retries"] = 2
 
 
-        # ====================================================
-        # LOGGING
-        # ====================================================
+        # LOG
+        # ------------------------------------------------
 
-        print("")
         print("=" * 60)
+
         print("STARTING DOWNLOAD")
-        print("=" * 60)
 
-        print(
-            "URL:",
-            url
-        )
+        print("URL:", url)
 
-        print(
-            "TYPE:",
-            media_type
-        )
+        print("TYPE:", media_type)
 
-        print(
-            "QUALITY:",
-            quality
-        )
+        print("QUALITY:", quality)
 
-        print(
-            "RENDER:",
-            IS_RENDER
-        )
-
-        print(
-            "POT SERVER:",
-            POT_SERVER
-        )
+        print("RENDER:", IS_RENDER)
 
         print("=" * 60)
 
 
-        # ====================================================
+        # ------------------------------------------------
         # YT-DLP
-        # ====================================================
+        # ------------------------------------------------
 
         with yt_dlp.YoutubeDL(options) as ydl:
 
@@ -493,14 +312,12 @@ def download():
                 download=True
             )
 
-            downloaded_file = ydl.prepare_filename(
-                info
-            )
+            downloaded_file = ydl.prepare_filename(info)
 
 
-        # ====================================================
+        # ------------------------------------------------
         # FIND ACTUAL FILE
-        # ====================================================
+        # ------------------------------------------------
 
         if not os.path.exists(downloaded_file):
 
@@ -513,56 +330,18 @@ def download():
 
             if possible_files:
 
-                # Prefer mp4
-                mp4_files = [
-                    f
-                    for f in possible_files
-                    if f.lower().endswith(".mp4")
-                ]
+                downloaded_file = possible_files[0]
 
 
-                if mp4_files:
-
-                    downloaded_file = mp4_files[0]
-
-                else:
-
-                    downloaded_file = possible_files[0]
-
-
-        # ====================================================
+        # ------------------------------------------------
         # FILE NOT FOUND
-        # ====================================================
+        # ------------------------------------------------
 
         if not os.path.exists(downloaded_file):
 
-            print("")
-            print("=" * 60)
-            print("FILE NOT FOUND")
-            print("=" * 60)
-
-            print(
-                "Expected:",
-                downloaded_file
-            )
-
-            print(
-                "Available files:",
-                glob.glob(
-                    os.path.join(
-                        DOWNLOAD_FOLDER,
-                        file_id + ".*"
-                    )
-                )
-            )
-
-            print("=" * 60)
-
-
             return jsonify({
 
-                "success":
-                    False,
+                "success": False,
 
                 "message":
                     "Downloaded file could not be found."
@@ -570,245 +349,141 @@ def download():
             }), 500
 
 
-        # ====================================================
+        # ------------------------------------------------
         # FINAL FILE NAME
-        # ====================================================
+        # ------------------------------------------------
 
         if media_type == "audio":
 
             if quality == "mp3":
 
-                filename = (
-                    "AMDownloader-Audio.mp3"
-                )
+                filename = "AMDownloader-Audio.mp3"
 
             else:
 
-                filename = (
-                    "AMDownloader-Audio.m4a"
-                )
-
+                filename = "AMDownloader-Audio.m4a"
 
         else:
 
-            filename = (
-                "AMDownloader-Video.mp4"
-            )
+            filename = "AMDownloader-Video.mp4"
 
-
-        # ====================================================
-        # SUCCESS LOG
-        # ====================================================
-
-        print("")
-        print("=" * 60)
-        print("DOWNLOAD COMPLETED")
-        print("=" * 60)
 
         print(
-            "FILE:",
+            "DOWNLOAD COMPLETED:",
             downloaded_file
         )
 
-        print("=" * 60)
 
-
-        # ====================================================
+        # ------------------------------------------------
         # SEND FILE
-        # ====================================================
+        # ------------------------------------------------
 
-        return send_file(
+        response = send_file(
 
             downloaded_file,
 
             as_attachment=True,
 
             download_name=filename
-
         )
 
 
-    # ========================================================
-    # YT-DLP ERROR
-    # ========================================================
+        return response
+
+
+    # ------------------------------------------------
+    # ERRORS
+    # ------------------------------------------------
 
     except yt_dlp.utils.DownloadError as e:
 
         error_text = str(e)
 
+        print("=" * 60)
 
-        print("")
-        print("=" * 60)
         print("YT-DLP DOWNLOAD ERROR")
-        print("=" * 60)
 
         print(error_text)
 
         print("=" * 60)
 
 
-        # ----------------------------------------------------
-        # BOT DETECTION
-        # ----------------------------------------------------
+        # YouTube bot verification
 
-        bot_error = (
-
+        if (
             "Sign in to confirm you're not a bot"
             in error_text
-
             or
-
             "Sign in to confirm you’re not a bot"
             in error_text
-
             or
-
-            "not a bot"
-            in error_text.lower()
-
-        )
-
-
-        if bot_error:
+            "not a bot" in error_text
+        ):
 
             return jsonify({
 
-                "success":
-                    False,
+                "success": False,
 
                 "message":
-                    (
-                        "YouTube is currently blocking "
-                        "requests from this server. "
-                        "Please try another public video later."
-                    )
+                    "YouTube is currently blocking this server request. "
+                    "Please try another public video later."
 
             }), 503
 
 
-        # ----------------------------------------------------
-        # VIDEO UNAVAILABLE
-        # ----------------------------------------------------
-
-        if "Video unavailable" in error_text:
-
-            return jsonify({
-
-                "success":
-                    False,
-
-                "message":
-                    (
-                        "This video is unavailable "
-                        "or cannot be accessed."
-                    )
-
-            }), 404
-
-
-        # ----------------------------------------------------
-        # PRIVATE VIDEO
-        # ----------------------------------------------------
+        # Video unavailable
 
         if (
-            "Private video"
+            "Video unavailable"
             in error_text
         ):
 
             return jsonify({
 
-                "success":
-                    False,
+                "success": False,
 
                 "message":
-                    "This video is private."
+                    "This video is unavailable or cannot be accessed."
 
-            }), 403
+            }), 404
 
-
-        # ----------------------------------------------------
-        # AGE RESTRICTED
-        # ----------------------------------------------------
-
-        if (
-            "age-restricted"
-            in error_text.lower()
-            or
-            "age restricted"
-            in error_text.lower()
-        ):
-
-            return jsonify({
-
-                "success":
-                    False,
-
-                "message":
-                    (
-                        "This video is age restricted "
-                        "and cannot be downloaded."
-                    )
-
-            }), 403
-
-
-        # ----------------------------------------------------
-        # GENERIC YT-DLP ERROR
-        # ----------------------------------------------------
 
         return jsonify({
 
-            "success":
-                False,
+            "success": False,
 
             "message":
-                (
-                    "The media could not be downloaded. "
-                    "Please try another public video."
-                )
+                "The media could not be downloaded. "
+                "Please try another public video."
 
         }), 500
 
-
-    # ========================================================
-    # GENERAL ERROR
-    # ========================================================
 
     except Exception as e:
 
-        print("")
         print("=" * 60)
+
         print("GENERAL DOWNLOAD ERROR")
-        print("=" * 60)
 
-        print(
-            type(e).__name__
-        )
-
-        print(
-            str(e)
-        )
+        print(str(e))
 
         print("=" * 60)
 
 
         return jsonify({
 
-            "success":
-                False,
+            "success": False,
 
             "message":
-                (
-                    "Unable to download this media. "
-                    "Please try again later."
-                )
+                "Unable to download this media. "
+                "Please try again later."
 
         }), 500
 
 
-# ============================================================
-# RUN SERVER
-# ============================================================
+# ------------------------------------------------
+# RUN
+# ------------------------------------------------
 
 if __name__ == "__main__":
 
@@ -819,7 +494,6 @@ if __name__ == "__main__":
         )
     )
 
-
     app.run(
 
         host="0.0.0.0",
@@ -827,5 +501,4 @@ if __name__ == "__main__":
         port=port,
 
         debug=False
-
     )
