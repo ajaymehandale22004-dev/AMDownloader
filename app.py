@@ -9,13 +9,22 @@ DOWNLOAD_FOLDER = "downloads"
 os.makedirs(DOWNLOAD_FOLDER, exist_ok=True)
 
 
+# -----------------------------
+# Home
+# -----------------------------
+
 @app.route("/")
 def home():
     return render_template("index.html")
 
 
+# -----------------------------
+# URL Checker
+# -----------------------------
+
 @app.route("/check-url", methods=["POST"])
 def check_url():
+
     data = request.get_json() or {}
     url = data.get("url", "").strip()
 
@@ -47,6 +56,10 @@ def check_url():
     })
 
 
+# -----------------------------
+# Download
+# -----------------------------
+
 @app.route("/download", methods=["POST"])
 def download():
 
@@ -62,19 +75,33 @@ def download():
             "message": "Please enter a URL."
         }), 400
 
-    supported_url = (
-        "youtube.com" in url
-        or "youtu.be" in url
-        or "instagram.com" in url
-        or "facebook.com" in url
-        or "fb.watch" in url
-    )
 
-    if not supported_url:
+    # -------------------------
+    # Platform Detection
+    # -------------------------
+
+    if "youtube.com" in url or "youtu.be" in url:
+        platform = "youtube"
+
+    elif "instagram.com" in url:
+        platform = "instagram"
+
+    elif "facebook.com" in url or "fb.watch" in url:
+        platform = "facebook"
+
+    else:
         return jsonify({
             "success": False,
             "message": "Unsupported URL."
         }), 400
+
+
+    # -------------------------
+    # Validate Type
+    # -------------------------
+
+    if media_type not in ["video", "audio"]:
+        media_type = "video"
 
 
     file_id = str(uuid.uuid4())
@@ -82,23 +109,34 @@ def download():
 
     try:
 
+        # ==================================================
         # AUDIO
+        # ==================================================
 
         if media_type == "audio":
+
+            # -------------------------
+            # MP3
+            # -------------------------
 
             if quality == "mp3":
 
                 output_template = os.path.join(
                     DOWNLOAD_FOLDER,
-                    file_id + ".mp3"
+                    file_id + ".%(ext)s"
                 )
 
                 options = {
                     "format": "bestaudio/best",
+
                     "outtmpl": output_template,
+
                     "noplaylist": True,
+
                     "quiet": True,
+
                     "no_warnings": True,
+
                     "postprocessors": [
                         {
                             "key": "FFmpegExtractAudio",
@@ -108,23 +146,34 @@ def download():
                     ]
                 }
 
+
+            # -------------------------
+            # M4A / Best Audio
+            # -------------------------
+
             else:
 
                 output_template = os.path.join(
                     DOWNLOAD_FOLDER,
-                    file_id + ".m4a"
+                    file_id + ".%(ext)s"
                 )
 
                 options = {
                     "format": "bestaudio[ext=m4a]/bestaudio",
+
                     "outtmpl": output_template,
+
                     "noplaylist": True,
+
                     "quiet": True,
+
                     "no_warnings": True
                 }
 
 
+        # ==================================================
         # VIDEO
+        # ==================================================
 
         else:
 
@@ -133,6 +182,10 @@ def download():
                 file_id + ".%(ext)s"
             )
 
+
+            # -------------------------
+            # Quality Selection
+            # -------------------------
 
             if quality == "1080":
 
@@ -164,20 +217,30 @@ def download():
 
             else:
 
-                video_format = "bestvideo+bestaudio/best"
+                video_format = (
+                    "bestvideo+bestaudio/"
+                    "best"
+                )
 
 
             options = {
                 "format": video_format,
+
                 "outtmpl": output_template,
+
                 "merge_output_format": "mp4",
+
                 "noplaylist": True,
+
                 "quiet": True,
+
                 "no_warnings": True
             }
 
 
-        # DOWNLOAD
+        # ==================================================
+        # Download
+        # ==================================================
 
         with yt_dlp.YoutubeDL(options) as ydl:
 
@@ -189,22 +252,34 @@ def download():
             downloaded_file = ydl.prepare_filename(info)
 
 
-        # Find actual downloaded file
+        # ==================================================
+        # Find Downloaded File
+        # ==================================================
 
         if not os.path.exists(downloaded_file):
 
-            possible_files = [
-                os.path.join(
-                    DOWNLOAD_FOLDER,
-                    filename
-                )
-                for filename in os.listdir(DOWNLOAD_FOLDER)
-                if filename.startswith(file_id)
-            ]
+            possible_files = []
+
+            for filename in os.listdir(DOWNLOAD_FOLDER):
+
+                if filename.startswith(file_id):
+
+                    possible_files.append(
+                        os.path.join(
+                            DOWNLOAD_FOLDER,
+                            filename
+                        )
+                    )
+
 
             if possible_files:
+
                 downloaded_file = possible_files[0]
 
+
+        # ==================================================
+        # File Not Found
+        # ==================================================
 
         if not os.path.exists(downloaded_file):
 
@@ -214,19 +289,29 @@ def download():
             }), 500
 
 
-        # Download filename
+        # ==================================================
+        # Output Filename
+        # ==================================================
 
         if media_type == "audio":
 
             if quality == "mp3":
+
                 filename = "AMDownloader-Audio.mp3"
+
             else:
+
                 filename = "AMDownloader-Audio.m4a"
+
 
         else:
 
             filename = "AMDownloader-Video.mp4"
 
+
+        # ==================================================
+        # Send File
+        # ==================================================
 
         return send_file(
             downloaded_file,
@@ -235,15 +320,86 @@ def download():
         )
 
 
+    # ======================================================
+    # Errors
+    # ======================================================
+
     except Exception as e:
 
-        print("Download error:", e)
+        error_text = str(e)
+
+        print("=" * 60)
+        print("DOWNLOAD ERROR")
+        print(error_text)
+        print("=" * 60)
+
+
+        # -------------------------
+        # YouTube Bot Error
+        # -------------------------
+
+        if (
+            "Sign in to confirm" in error_text
+            or "not a bot" in error_text
+            or "confirm you're not a bot" in error_text
+        ):
+
+            message = (
+                "YouTube is currently blocking this server request. "
+                "Please try another public video later."
+            )
+
+
+        # -------------------------
+        # Format Error
+        # -------------------------
+
+        elif (
+            "Requested format is not available"
+            in error_text
+        ):
+
+            message = (
+                "The selected quality is not available "
+                "for this media."
+            )
+
+
+        # -------------------------
+        # Login / Private Content
+        # -------------------------
+
+        elif (
+            "login required" in error_text.lower()
+            or "private" in error_text.lower()
+        ):
+
+            message = (
+                "This media is private or requires login."
+            )
+
+
+        # -------------------------
+        # Generic Error
+        # -------------------------
+
+        else:
+
+            message = (
+                "Unable to download this media. "
+                "Please check the URL and try again."
+            )
+
 
         return jsonify({
             "success": False,
-            "message": "Unable to download this media. The selected format may not be available."
+            "message": message
         }), 500
 
+
+# -----------------------------
+# Run Server
+# -----------------------------
 
 if __name__ == "__main__":
 
@@ -252,4 +408,3 @@ if __name__ == "__main__":
         port=5000,
         debug=True
     )
-    
