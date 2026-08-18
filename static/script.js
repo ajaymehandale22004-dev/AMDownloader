@@ -7,10 +7,14 @@ document.addEventListener("DOMContentLoaded", () => {
     const downloadBtn = document.getElementById("downloadBtn");
 
     const videoQuality = document.getElementById("videoQuality");
+    const photoQuality = document.getElementById("photoQuality");
     const audioQuality = document.getElementById("audioQuality");
 
     const videoQualitySelect =
         document.getElementById("videoQualitySelect");
+
+    const photoFormatSelect =
+        document.getElementById("photoFormatSelect");
 
     const audioQualitySelect =
         document.getElementById("audioQualitySelect");
@@ -37,7 +41,6 @@ document.addEventListener("DOMContentLoaded", () => {
         }
 
         status.textContent = message;
-
         status.className = "status show " + type;
     }
 
@@ -49,7 +52,6 @@ document.addEventListener("DOMContentLoaded", () => {
         }
 
         status.textContent = "";
-
         status.className = "status";
     }
 
@@ -66,8 +68,17 @@ document.addEventListener("DOMContentLoaded", () => {
 
         if (currentPlatform === "instagram") {
 
-            urlInput.placeholder =
-                "Paste your Instagram URL here...";
+            if (currentType === "photo") {
+
+                urlInput.placeholder =
+                    "Paste your Instagram photo URL here...";
+
+            } else {
+
+                urlInput.placeholder =
+                    "Paste your Instagram URL here...";
+
+            }
 
         } else if (currentPlatform === "facebook") {
 
@@ -78,6 +89,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
             urlInput.placeholder =
                 "Paste your media URL here...";
+
         }
     }
 
@@ -91,7 +103,8 @@ document.addEventListener("DOMContentLoaded", () => {
         const platform =
             button.dataset.platform;
 
-        /* Hide YouTube completely */
+
+        /* Hide YouTube */
 
         if (platform === "youtube") {
 
@@ -117,12 +130,64 @@ document.addEventListener("DOMContentLoaded", () => {
             button.classList.add("active");
 
 
+            /* Reset type to video */
+
+            currentType = "video";
+
+            typeButtons.forEach((item) => {
+
+                item.classList.remove("active");
+
+            });
+
+            const videoButton =
+                document.querySelector(
+                    '.type-btn[data-type="video"]'
+                );
+
+            if (videoButton) {
+
+                videoButton.classList.add("active");
+
+            }
+
+
+            /* Show video quality */
+
+            if (videoQuality) {
+
+                videoQuality.style.display =
+                    "flex";
+
+            }
+
+
+            /* Hide photo quality */
+
+            if (photoQuality) {
+
+                photoQuality.style.display =
+                    "none";
+
+            }
+
+
+            /* Hide audio quality */
+
+            if (audioQuality) {
+
+                audioQuality.style.display =
+                    "none";
+
+            }
+
+
             /* Update placeholder */
 
             updatePlaceholder();
 
 
-            /* Clear old status */
+            /* Clear status */
 
             hideStatus();
 
@@ -132,7 +197,6 @@ document.addEventListener("DOMContentLoaded", () => {
             if (urlInput) {
 
                 urlInput.value = "";
-
                 urlInput.focus();
 
             }
@@ -143,7 +207,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
 
     /* =========================
-       VIDEO / AUDIO BUTTONS
+       VIDEO / PHOTO / AUDIO
     ========================= */
 
     typeButtons.forEach((button) => {
@@ -165,7 +229,7 @@ document.addEventListener("DOMContentLoaded", () => {
             button.classList.add("active");
 
 
-            /* Show video quality */
+            /* VIDEO */
 
             if (currentType === "video") {
 
@@ -176,6 +240,13 @@ document.addEventListener("DOMContentLoaded", () => {
 
                 }
 
+                if (photoQuality) {
+
+                    photoQuality.style.display =
+                        "none";
+
+                }
+
                 if (audioQuality) {
 
                     audioQuality.style.display =
@@ -186,13 +257,48 @@ document.addEventListener("DOMContentLoaded", () => {
             }
 
 
-            /* Show audio quality */
+            /* PHOTO */
+
+            else if (currentType === "photo") {
+
+                if (videoQuality) {
+
+                    videoQuality.style.display =
+                        "none";
+
+                }
+
+                if (photoQuality) {
+
+                    photoQuality.style.display =
+                        "flex";
+
+                }
+
+                if (audioQuality) {
+
+                    audioQuality.style.display =
+                        "none";
+
+                }
+
+            }
+
+
+            /* AUDIO */
 
             else {
 
                 if (videoQuality) {
 
                     videoQuality.style.display =
+                        "none";
+
+                }
+
+                if (photoQuality) {
+
+                    photoQuality.style.display =
                         "none";
 
                 }
@@ -206,6 +312,8 @@ document.addEventListener("DOMContentLoaded", () => {
 
             }
 
+
+            updatePlaceholder();
 
             hideStatus();
 
@@ -271,316 +379,365 @@ document.addEventListener("DOMContentLoaded", () => {
 
     if (downloadBtn) {
 
-        downloadBtn.addEventListener("click", async () => {
+        downloadBtn.addEventListener(
+            "click",
+            async () => {
 
-            hideStatus();
-
-
-            const url =
-                urlInput.value.trim();
+                hideStatus();
 
 
-            /* Empty URL */
-
-            if (!url) {
-
-                showStatus(
-                    "Please paste an Instagram or Facebook URL."
-                );
-
-                return;
-
-            }
+                const url =
+                    urlInput.value.trim();
 
 
-            /* URL format */
+                /* Empty URL */
 
-            if (!isValidUrl(url)) {
-
-                showStatus(
-                    "Please enter a valid URL."
-                );
-
-                return;
-
-            }
-
-
-            /* Platform check */
-
-            if (!validatePlatformUrl(url)) {
-
-                if (currentPlatform === "instagram") {
+                if (!url) {
 
                     showStatus(
-                        "Please enter a valid Instagram URL."
+                        "Please paste an Instagram or Facebook URL."
                     );
 
-                } else {
-
-                    showStatus(
-                        "Please enter a valid Facebook URL."
-                    );
+                    return;
 
                 }
 
-                return;
 
-            }
+                /* URL format */
 
+                if (!isValidUrl(url)) {
 
-            /* =========================
-               GET QUALITY
-            ========================= */
+                    showStatus(
+                        "Please enter a valid URL."
+                    );
 
-            let quality = "best";
+                    return;
 
-
-            if (currentType === "video") {
-
-                quality =
-                    videoQualitySelect
-                        ? videoQualitySelect.value
-                        : "best";
-
-            } else {
-
-                quality =
-                    audioQualitySelect
-                        ? audioQualitySelect.value
-                        : "best";
-
-            }
+                }
 
 
-            /* =========================
-               BUTTON LOADING
-            ========================= */
+                /* Platform check */
 
-            const originalText =
-                downloadBtn.textContent;
+                if (!validatePlatformUrl(url)) {
 
+                    if (
+                        currentPlatform ===
+                        "instagram"
+                    ) {
 
-            downloadBtn.disabled = true;
+                        showStatus(
+                            "Please enter a valid Instagram URL."
+                        );
 
-            downloadBtn.textContent =
-                "Processing...";
+                    } else {
 
+                        showStatus(
+                            "Please enter a valid Facebook URL."
+                        );
 
-            try {
+                    }
 
-                console.log(
-                    "Starting download..."
-                );
+                    return;
 
-                console.log(
-                    "Platform:",
-                    currentPlatform
-                );
-
-                console.log(
-                    "Type:",
-                    currentType
-                );
-
-                console.log(
-                    "Quality:",
-                    quality
-                );
+                }
 
 
                 /* =========================
-                   SEND REQUEST
+                   GET QUALITY / FORMAT
                 ========================= */
 
-                const response =
-                    await fetch("/download", {
-
-                        method: "POST",
-
-                        headers: {
-                            "Content-Type":
-                                "application/json"
-                        },
-
-                        body: JSON.stringify({
-
-                            url: url,
-
-                            type: currentType,
-
-                            quality: quality
-
-                        })
-
-                    });
+                let quality = "best";
 
 
-                /* =========================
-                   CHECK RESPONSE
-                ========================= */
+                if (currentType === "video") {
 
-                const contentType =
-                    response.headers.get(
-                        "content-type"
-                    ) || "";
+                    quality =
+                        videoQualitySelect
+                            ? videoQualitySelect.value
+                            : "best";
 
+                }
 
-                /* Server returned JSON error */
-
-                if (
-                    contentType.includes(
-                        "application/json"
-                    )
+                else if (
+                    currentType === "photo"
                 ) {
 
-                    const data =
-                        await response.json();
+                    quality =
+                        photoFormatSelect
+                            ? photoFormatSelect.value
+                            : "jpg";
 
+                }
+
+                else {
+
+                    quality =
+                        audioQualitySelect
+                            ? audioQualitySelect.value
+                            : "best";
+
+                }
+
+
+                /* =========================
+                   BUTTON LOADING
+                ========================= */
+
+                const originalText =
+                    downloadBtn.textContent;
+
+
+                downloadBtn.disabled = true;
+
+                downloadBtn.textContent =
+                    "Processing...";
+
+
+                try {
+
+                    console.log(
+                        "Starting download..."
+                    );
+
+                    console.log(
+                        "Platform:",
+                        currentPlatform
+                    );
+
+                    console.log(
+                        "Type:",
+                        currentType
+                    );
+
+                    console.log(
+                        "Quality:",
+                        quality
+                    );
+
+
+                    /* =========================
+                       SEND REQUEST
+                    ========================= */
+
+                    const response =
+                        await fetch(
+                            "/download",
+                            {
+
+                                method: "POST",
+
+                                headers: {
+                                    "Content-Type":
+                                        "application/json"
+                                },
+
+                                body:
+                                    JSON.stringify({
+
+                                        url: url,
+
+                                        type:
+                                            currentType,
+
+                                        quality:
+                                            quality
+
+                                    })
+
+                            }
+                        );
+
+
+                    /* =========================
+                       CHECK RESPONSE
+                    ========================= */
+
+                    const contentType =
+                        response.headers.get(
+                            "content-type"
+                        ) || "";
+
+
+                    /* Server returned JSON */
+
+                    if (
+                        contentType.includes(
+                            "application/json"
+                        )
+                    ) {
+
+                        const data =
+                            await response.json();
+
+
+                        if (!response.ok) {
+
+                            throw new Error(
+                                data.message ||
+                                "Download failed."
+                            );
+
+                        }
+
+
+                        if (
+                            data.success === false
+                        ) {
+
+                            throw new Error(
+                                data.message ||
+                                "Download failed."
+                            );
+
+                        }
+
+                    }
+
+
+                    /* Server error */
 
                     if (!response.ok) {
 
                         throw new Error(
-                            data.message ||
-                            "Download failed."
+                            "Server error " +
+                            response.status
                         );
 
                     }
+
+
+                    /* =========================
+                       GET FILE
+                    ========================= */
+
+                    const blob =
+                        await response.blob();
 
 
                     if (
-                        data.success === false
+                        !blob ||
+                        blob.size === 0
                     ) {
 
                         throw new Error(
-                            data.message ||
-                            "Download failed."
+                            "Downloaded file is empty."
                         );
 
                     }
 
-                }
+
+                    /* =========================
+                       FILE NAME
+                    ========================= */
+
+                    let filename =
+                        "AMDownloader-Video.mp4";
 
 
-                /* Server error */
-
-                if (!response.ok) {
-
-                    throw new Error(
-                        "Server error " +
-                        response.status
-                    );
-
-                }
-
-
-                /* =========================
-                   GET FILE
-                ========================= */
-
-                const blob =
-                    await response.blob();
-
-
-                if (!blob || blob.size === 0) {
-
-                    throw new Error(
-                        "Downloaded file is empty."
-                    );
-
-                }
-
-
-                /* =========================
-                   FILE NAME
-                ========================= */
-
-                let filename =
-                    "AMDownloader-Video.mp4";
-
-
-                if (currentType === "audio") {
-
-                    if (quality === "mp3") {
+                    if (
+                        currentType ===
+                        "photo"
+                    ) {
 
                         filename =
-                            "AMDownloader-Audio.mp3";
-
-                    } else {
-
-                        filename =
-                            "AMDownloader-Audio.m4a";
+                            "AMDownloader-Photo.jpg";
 
                     }
 
-                }
+                    else if (
+                        currentType ===
+                        "audio"
+                    ) {
+
+                        if (
+                            quality === "mp3"
+                        ) {
+
+                            filename =
+                                "AMDownloader-Audio.mp3";
+
+                        } else {
+
+                            filename =
+                                "AMDownloader-Audio.m4a";
+
+                        }
+
+                    }
 
 
-                /* =========================
-                   DOWNLOAD FILE
-                ========================= */
+                    /* =========================
+                       DOWNLOAD FILE
+                    ========================= */
 
-                const blobUrl =
-                    window.URL.createObjectURL(
-                        blob
+                    const blobUrl =
+                        window.URL.createObjectURL(
+                            blob
+                        );
+
+
+                    const link =
+                        document.createElement(
+                            "a"
+                        );
+
+
+                    link.href =
+                        blobUrl;
+
+                    link.download =
+                        filename;
+
+                    document.body.appendChild(
+                        link
+                    );
+
+                    link.click();
+
+                    link.remove();
+
+
+                    window.URL.revokeObjectURL(
+                        blobUrl
                     );
 
 
-                const link =
-                    document.createElement("a");
+                    /* =========================
+                       SUCCESS
+                    ========================= */
+
+                    showStatus(
+                        "Download completed successfully.",
+                        "success"
+                    );
 
 
-                link.href = blobUrl;
+                } catch (error) {
 
-                link.download = filename;
-
-                document.body.appendChild(link);
-
-                link.click();
-
-                link.remove();
+                    console.error(
+                        "Download error:",
+                        error
+                    );
 
 
-                window.URL.revokeObjectURL(
-                    blobUrl
-                );
+                    showStatus(
+                        error.message ||
+                        "Unable to download this media. Please try again."
+                    );
 
 
-                /* =========================
-                   SUCCESS
-                ========================= */
+                } finally {
 
-                showStatus(
-                    "Download completed successfully.",
-                    "success"
-                );
+                    downloadBtn.disabled =
+                        false;
 
+                    downloadBtn.textContent =
+                        originalText;
 
-            } catch (error) {
-
-                console.error(
-                    "Download error:",
-                    error
-                );
-
-
-                showStatus(
-                    error.message ||
-                    "Unable to download this media. Please try again."
-                );
-
-
-            } finally {
-
-                downloadBtn.disabled =
-                    false;
-
-                downloadBtn.textContent =
-                    originalText;
+                }
 
             }
-
-        });
+        );
 
     }
 
@@ -589,57 +746,75 @@ document.addEventListener("DOMContentLoaded", () => {
        INITIAL SETTINGS
     ========================= */
 
-    currentPlatform = "instagram";
+    currentPlatform =
+        "instagram";
 
-    currentType = "video";
-
-
-    /* Make Instagram active */
-
-    platformButtons.forEach((button) => {
-
-        if (
-            button.dataset.platform ===
-            "instagram"
-        ) {
-
-            button.classList.add("active");
-
-        }
-
-        if (
-            button.dataset.platform ===
-            "youtube"
-        ) {
-
-            button.style.display = "none";
-
-            button.classList.remove(
-                "active"
-            );
-
-        }
-
-    });
+    currentType =
+        "video";
 
 
-    /* Make Video active */
+    /* =========================
+       MAKE INSTAGRAM ACTIVE
+    ========================= */
 
-    typeButtons.forEach((button) => {
+    platformButtons.forEach(
+        (button) => {
 
-        if (
-            button.dataset.type ===
-            "video"
-        ) {
+            if (
+                button.dataset.platform ===
+                "instagram"
+            ) {
 
-            button.classList.add("active");
+                button.classList.add(
+                    "active"
+                );
+
+            }
+
+
+            if (
+                button.dataset.platform ===
+                "youtube"
+            ) {
+
+                button.style.display =
+                    "none";
+
+                button.classList.remove(
+                    "active"
+                );
+
+            }
 
         }
+    );
 
-    });
+
+    /* =========================
+       MAKE VIDEO ACTIVE
+    ========================= */
+
+    typeButtons.forEach(
+        (button) => {
+
+            if (
+                button.dataset.type ===
+                "video"
+            ) {
+
+                button.classList.add(
+                    "active"
+                );
+
+            }
+
+        }
+    );
 
 
-    /* Show video quality */
+    /* =========================
+       SHOW VIDEO QUALITY
+    ========================= */
 
     if (videoQuality) {
 
@@ -649,6 +824,22 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
 
+    /* =========================
+       HIDE PHOTO QUALITY
+    ========================= */
+
+    if (photoQuality) {
+
+        photoQuality.style.display =
+            "none";
+
+    }
+
+
+    /* =========================
+       HIDE AUDIO QUALITY
+    ========================= */
+
     if (audioQuality) {
 
         audioQuality.style.display =
@@ -657,7 +848,9 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
 
-    /* Set correct placeholder */
+    /* =========================
+       SET PLACEHOLDER
+    ========================= */
 
     updatePlaceholder();
 

@@ -12,7 +12,9 @@
 
 <body>
 
-    <!-- Navbar -->
+    <!-- =========================
+         NAVBAR
+    ========================== -->
     <header class="navbar">
 
         <div class="logo">
@@ -28,19 +30,27 @@
     </header>
 
 
+    <!-- =========================
+         MAIN
+    ========================== -->
     <main id="home">
 
-        <!-- Hero Section -->
+
+        <!-- =========================
+             HERO SECTION
+        ========================== -->
         <section class="hero">
 
             <div class="badge">
                 ⚡ Fast & Simple Media Downloader
             </div>
 
+
             <h1>
                 Download Your Favorite
                 <span>Media</span>
             </h1>
+
 
             <p class="hero-text">
                 Download supported media from Instagram and Facebook.
@@ -48,11 +58,17 @@
             </p>
 
 
-            <!-- Downloader -->
+            <!-- =========================
+                 DOWNLOAD BOX
+            ========================== -->
             <div class="download-box">
 
-                <!-- Platforms -->
+
+                <!-- =========================
+                     PLATFORM BUTTONS
+                ========================== -->
                 <div class="platforms">
+
 
                     <!-- Instagram -->
                     <button
@@ -60,8 +76,11 @@
                         data-platform="instagram"
                         type="button"
                     >
+
                         <span>◎</span>
+
                         Instagram
+
                     </button>
 
 
@@ -71,14 +90,20 @@
                         data-platform="facebook"
                         type="button"
                     >
+
                         <span>f</span>
+
                         Facebook
+
                     </button>
+
 
                 </div>
 
 
-                <!-- URL Input -->
+                <!-- =========================
+                     URL INPUT
+                ========================== -->
                 <div class="input-area">
 
                     <input
@@ -91,38 +116,53 @@
                 </div>
 
 
-                <!-- Download Options -->
+                <!-- =========================
+                     DOWNLOAD OPTIONS
+                ========================== -->
                 <div class="download-options">
+
 
                     <div class="option-title">
                         Download Type
                     </div>
 
 
-                    <!-- Video / Audio -->
+                    <!-- =========================
+                         VIDEO / AUDIO
+                    ========================== -->
                     <div class="type-buttons">
 
+
+                        <!-- VIDEO -->
                         <button
                             class="type-btn active"
                             data-type="video"
                             type="button"
                         >
+
                             🎬 Video
+
                         </button>
 
 
+                        <!-- AUDIO -->
                         <button
                             class="type-btn"
                             data-type="audio"
                             type="button"
                         >
+
                             🎵 Audio
+
                         </button>
+
 
                     </div>
 
 
-                    <!-- Video Quality -->
+                    <!-- =========================
+                         VIDEO QUALITY
+                    ========================== -->
                     <div
                         class="quality-section"
                         id="videoQuality"
@@ -135,32 +175,40 @@
 
                         <select id="videoQualitySelect">
 
+
                             <option value="best">
                                 Best Quality
                             </option>
+
 
                             <option value="1080">
                                 1080p Full HD
                             </option>
 
+
                             <option value="720">
                                 720p HD
                             </option>
+
 
                             <option value="480">
                                 480p
                             </option>
 
+
                             <option value="360">
                                 360p
                             </option>
+
 
                         </select>
 
                     </div>
 
 
-                    <!-- Audio Format -->
+                    <!-- =========================
+                         AUDIO FORMAT
+                    ========================== -->
                     <div
                         class="quality-section"
                         id="audioQuality"
@@ -174,39 +222,50 @@
 
                         <select id="audioQualitySelect">
 
+
                             <option value="best">
                                 Best Audio
                             </option>
+
 
                             <option value="mp3">
                                 MP3
                             </option>
 
+
                             <option value="m4a">
                                 M4A
                             </option>
+
 
                         </select>
 
                     </div>
 
 
-                    <!-- Download Button -->
+                    <!-- =========================
+                         DOWNLOAD BUTTON
+                    ========================== -->
                     <div class="download-action">
 
                         <button
                             id="downloadBtn"
                             type="button"
                         >
+
                             Download
+
                         </button>
 
                     </div>
 
+
                 </div>
 
 
-                <!-- Status -->
+                <!-- =========================
+                     STATUS MESSAGE
+                ========================== -->
                 <div
                     id="status"
                     class="status"
@@ -218,11 +277,14 @@
         </section>
 
 
-        <!-- Features Section -->
+        <!-- =========================
+             FEATURES SECTION
+        ========================== -->
         <section
             class="features"
             id="features"
         >
+
 
             <h2>
                 Why Choose AMDownloader?
@@ -240,18 +302,22 @@
                 <!-- Feature 1 -->
                 <div class="feature-card">
 
+
                     <div class="icon">
                         ⚡
                     </div>
+
 
                     <h3>
                         Fast Processing
                     </h3>
 
+
                     <p>
                         Process supported media links with a simple
                         and easy workflow.
                     </p>
+
 
                 </div>
 
@@ -259,18 +325,22 @@
                 <!-- Feature 2 -->
                 <div class="feature-card">
 
+
                     <div class="icon">
                         🎬
                     </div>
+
 
                     <h3>
                         Video & Audio
                     </h3>
 
+
                     <p>
                         Choose your preferred video quality or
                         download audio separately.
                     </p>
+
 
                 </div>
 
@@ -278,18 +348,22 @@
                 <!-- Feature 3 -->
                 <div class="feature-card">
 
+
                     <div class="icon">
                         📱
                     </div>
+
 
                     <h3>
                         Mobile Friendly
                     </h3>
 
+
                     <p>
                         Use AMDownloader easily on mobile,
                         tablet and desktop.
                     </p>
+
 
                 </div>
 
@@ -299,11 +373,14 @@
         </section>
 
 
-        <!-- About Section -->
+        <!-- =========================
+             ABOUT SECTION
+        ========================== -->
         <section
             class="about"
             id="about"
         >
+
 
             <h2>
                 About AMDownloader
@@ -313,15 +390,19 @@
             <p>
                 AMDownloader provides a simple interface for processing
                 supported Instagram and Facebook URLs and selecting
-                your preferred format.
+                your preferred video or audio format.
             </p>
 
+
         </section>
+
 
     </main>
 
 
-    <!-- Footer -->
+    <!-- =========================
+         FOOTER
+    ========================== -->
     <footer>
 
         <p>
@@ -331,7 +412,11 @@
     </footer>
 
 
+    <!-- =========================
+         JAVASCRIPT
+    ========================== -->
     <script src="{{ url_for('static', filename='script.js') }}"></script>
+
 
 </body>
 

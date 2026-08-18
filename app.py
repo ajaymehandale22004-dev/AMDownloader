@@ -4,7 +4,9 @@ import os
 import uuid
 import glob
 
+
 app = Flask(__name__)
+
 
 DOWNLOAD_FOLDER = "downloads"
 os.makedirs(DOWNLOAD_FOLDER, exist_ok=True)
@@ -183,9 +185,9 @@ def download():
 
         else:
 
-            # Instagram/Facebook reels can provide a single combined
-            # video+audio format. Try that first, then separate streams,
-            # then fall back to the best available format.
+            # Instagram/Facebook reels can provide a single
+            # combined video+audio format. Try that first,
+            # then separate streams, then fall back to best.
 
             if quality == "1080":
 
@@ -256,8 +258,9 @@ def download():
             or "youtu.be" in url
         )
 
+
         if is_youtube:
-            
+
             print("")
             print("=" * 60)
             print("YOUTUBE CONFIGURATION")
@@ -275,14 +278,18 @@ def download():
 
             print("=" * 60)
 
+
             options["extractor_args"] = {
+
                 "youtube": {
                     "player_client": ["mweb"]
                 },
+
                 "youtubepot-bgutilhttp": {
                     "base_url": POT_SERVER
                 }
             }
+
 
             options["verbose"] = True
             options["socket_timeout"] = 30
@@ -290,6 +297,7 @@ def download():
             options["fragment_retries"] = 2
 
 
+        # ------------------------------------------------
         # LOG
         # ------------------------------------------------
 
@@ -420,11 +428,16 @@ def download():
         if (
             "Sign in to confirm you're not a bot"
             in error_text
+
             or
+
             "Sign in to confirm you’re not a bot"
             in error_text
+
             or
-            "not a bot" in error_text
+
+            "not a bot"
+            in error_text
         ):
 
             return jsonify({
