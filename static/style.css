@@ -601,3 +601,61 @@ footer {
     }
 
 }
+/* ==============================
+   MOBILE DOWNLOAD OPTIONS
+   ============================== */
+
+@media (max-width: 600px) {
+
+    .download-options {
+        padding: 18px 16px;
+    }
+
+    .option-title {
+        font-size: 17px;
+        margin-bottom: 12px;
+    }
+
+    .type-buttons {
+        gap: 10px;
+    }
+
+    .type-btn {
+        min-height: 42px;
+        height: 42px;
+        font-size: 15px;
+        padding: 8px 12px;
+        border-radius: 10px;
+    }
+
+    .quality-section {
+        margin-top: 16px;
+    }
+
+    .quality-section label {
+        font-size: 15px;
+        margin-bottom: 8px;
+        display: block;
+    }
+
+    .quality-section select {
+        width: 100%;
+        min-height: 42px;
+        height: 42px;
+        font-size: 15px;
+        padding: 8px 12px;
+        border-radius: 10px;
+    }
+
+    .download-action {
+        margin-top: 18px;
+    }
+
+    #downloadBtn {
+        width: 100%;
+        min-height: 48px;
+        height: 48px;
+        font-size: 16px;
+        border-radius: 10px;
+    }
+}
